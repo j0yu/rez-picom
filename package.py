@@ -3,7 +3,7 @@ name = "picom"
 __version__ = "v8"
 version = __version__.replace("v", "") + "+local.1.0.0"
 
-variants = [["os-CentOS-7", "arch-x86_64"]]
+variants = [["os-centos-7", "arch-x86_64"]]
 
 build_command = r"""
 set -euf -o pipefail
@@ -58,4 +58,3 @@ def tools():
 
     bin_path = os.path.join(str(this.root), "bin")
     return os.listdir(bin_path)
-
