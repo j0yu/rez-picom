@@ -56,4 +56,9 @@ def tools():
     import os
 
     bin_path = os.path.join(str(this.root), "bin")
-    return os.listdir(bin_path)
+    executables = []
+    for item in os.listdir(bin_path):
+        path = os.path.join(bin_path, item)
+        if os.access(path, os.X_OK) and not os.path.isdir(path):
+            executables.append(item)
+    return executables
