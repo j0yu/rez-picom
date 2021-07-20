@@ -2,14 +2,14 @@ set -euf -o pipefail
 
 FORK="${FORK:-yshui/picom}"
 VERSION="${VERSION:-v8}"
-PREFIX="${INSTALL_PATH:-/picom}"
+PREFIX="${INSTALL_DIR:-/picom}"
 
 # Get sources
 git clone -b "$VERSION" https://github.com/"$FORK".git .
 git submodule update --init --recursive
 
 meson --buildtype=release -Dprefix="$PREFIX" . build
-ninja -C build install
+LD_RUN_PATH='$ORIGIN/../lib64:'"$PREFIX"/lib64 ninja -C build install
 
 # Copy over default configuration
 mkdir -p "$PREFIX"/etc/xdg

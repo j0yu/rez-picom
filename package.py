@@ -3,7 +3,7 @@ name = "picom"
 __version__ = "v8.2"
 version = __version__.replace("v", "") + "+local.1.0.0"
 
-variants = [["os-centos-7", "arch-x86_64"]]
+variants = [["os-CentOS-7", "arch-x86_64"]]
 
 relocatable = False
 
