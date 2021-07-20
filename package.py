@@ -1,45 +1,44 @@
 name = "picom"
 
-__version__ = "v8"
+__version__ = "v8.2"
 version = __version__.replace("v", "") + "+local.1.0.0"
 
 variants = [["os-centos-7", "arch-x86_64"]]
 
+relocatable = False
+
 build_command = r"""
 set -euf -o pipefail
 
-cp -v \
-    "$REZ_BUILD_SOURCE_PATH"/Dockerfile \
-    "$REZ_BUILD_SOURCE_PATH"/entrypoint.sh \
-    "$REZ_BUILD_PATH"
+cp "$REZ_BUILD_SOURCE_PATH"/Dockerfile "$REZ_BUILD_SOURCE_PATH"/entrypoint.sh .
 
-IIDFILE=$(mktemp "$REZ_BUILD_PATH"/DockerImageXXXXXX)
+IMAGE_ID_FILE="$(readlink -f DockerImageID)"
 
 # In rez resolved version:
 # - REZ_OS_MAJOR_VERSION = centos
 # - REZ_OS_MINOR_VERSION = 7
 docker build --rm \
     --build-arg CENTOS_MAJOR="$REZ_OS_MINOR_VERSION" \
-    --iidfile "$IIDFILE" \
+    --iidfile "$IMAGE_ID_FILE" \
     "$REZ_BUILD_PATH"
 
-CONTAINER_ARGS=()
-[ -t 1 ] && CONTAINER_ARGS+=("-it") || :
-CONTAINER_ARGS+=("--env" "INSTALL_PATH={INSTALL_PATH}")
+
+[ -t 1 ] && CONTAINER_ARGS=("--tty") || CONTAINER_ARGS=()
+CONTAINER_ARGS+=("--env" "INSTALL_DIR={install_dir}")
 CONTAINER_ARGS+=("--env" "VERSION={version}")
-CONTAINER_ARGS+=("$(cat $IIDFILE)")
+CONTAINER_ARGS+=("$(cat $IMAGE_ID_FILE)")
 
 if [ $REZ_BUILD_INSTALL -eq 1 ]
 then
     CONTAINER_ID=$(docker create "{CONTAINER_ARGS}")
     docker start -ia "$CONTAINER_ID"
-    docker cp "$CONTAINER_ID":"{INSTALL_PATH}"/. "{INSTALL_PATH}"
+    docker cp "$CONTAINER_ID":"{install_dir}"/. "{install_dir}"/
     docker rm "$CONTAINER_ID"
 fi
 """.format(
-    CONTAINER_ARGS="${{CONTAINER_ARGS[@]}}",
-    INSTALL_PATH="${{REZ_BUILD_INSTALL_PATH:-/usr/local}}",
     version=__version__,
+    install_dir="${{REZ_BUILD_INSTALL_PATH:-/usr/local}}",
+    CONTAINER_ARGS="${{CONTAINER_ARGS[@]}}",
 )
 
 
