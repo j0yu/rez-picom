@@ -46,7 +46,6 @@ def commands():
     import os.path
 
     env.PATH.append(os.path.join("{root}", "bin"))
-    env.LD_LIBRARY_PATH.append(os.path.join("{root}", "lib64"))
     env.XDG_CONFIG_DIRS.append(os.path.join("{root}", "etc", "xdg"))
     env.XDG_DATA_DIRS.append(os.path.join("{root}", "share"))
 
